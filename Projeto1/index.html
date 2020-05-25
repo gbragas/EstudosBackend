@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front Proeto</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4 text-center" v-if="nomeUsuario == false">
+                <h3>Escolha um nome de usuario</h3>
+                <input v-model="novoUsuario" ref="novoUsuario" type="text" placeholder="Usuario" @keyup.enter="addUsuario"> 
+                <button @click="addUsuario">Entrar</button>
+            </div>
+            <div v-else>
+                <div>
+                    <input v-model="novoPost" @keyup.enter="addPost" placeholder="Digite seu post">
+                    <button @click="addPost"> Publicar </button>
+
+                </div>
+
+
+                <div v-for="post in posts">
+                    <h4>User: {{ post.author }}</h4>
+                    <h6>Post: {{ post.content }}</h6>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const app = new Vue ({
+            el: "#app",
+            data: {
+                novoUsuario: '',
+                nomeUsuario: false,
+                novoPost: '',
+                posts: []
+
+            },
+            methods:{
+                addUsuario: function() {
+                    if(this.novoUsuario !== ''){
+                        this.nomeUsuario = true
+                    }
+                },
+                addPost: function() {
+                    axios.post("http://localhost:3000/posts", { author: `${this.novoUsuario}`, content: `${this.novoPost}` })
+                    .then(response => {
+                        this.posts = [response.data,...this.posts]
+                    })
+                    .catch(err =>{
+                        console.log("deu bo")
+                    })
+                }
+
+            },
+            created: function() {
+                axios.get('http://localhost:3000/posts')
+                        .then(response =>{
+                            this.posts = response.data
+                            console.log(response)
+                        })
+                        .catch(err =>{
+                            console.log("deu bo")
+                        })
+            }
+        })
+
+    </script>
+</body>
+</html>
